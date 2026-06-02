@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+fiscal.db
+.env
+*.db
