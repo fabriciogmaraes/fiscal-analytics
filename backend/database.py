@@ -24,8 +24,8 @@ class Receita(Base):
     ativo            = Column(Boolean, default=True)
     criado_em        = Column(DateTime, default=datetime.utcnow)
 
-class Despesa(Base):
-    __tablename__ = "despesas"
+class DespesaFixa(Base):
+    __tablename__ = "despesas_fixas"
 
     id               = Column(Integer, primary_key=True, index=True)
     nome             = Column(String, nullable=False) #ex: "Aluguel", "Conta de Luz"

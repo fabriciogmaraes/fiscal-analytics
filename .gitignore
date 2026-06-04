@@ -4,3 +4,4 @@ __pycache__/
 fiscal.db
 .env
 *.db
+.idea/
