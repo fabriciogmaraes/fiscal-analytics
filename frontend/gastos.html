@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fiscal Analytics — Gastos</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #0f0e17;
+        color: #e8e8f0;
+        min-height: 100vh;
+        padding: 1rem;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #2d2a4a;
+      }
+
+      .header h1 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #a89fff;
+      }
+
+      .nav {
+        display: flex;
+        gap: 8px;
+      }
+      .nav a {
+        font-size: 12px;
+        padding: 6px 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #9896b8;
+        border: 1px solid #2d2a4a;
+        transition: all 0.15s;
+      }
+      .nav a:hover,
+      .nav a.active {
+        background: #534ab7;
+        color: white;
+        border-color: #534ab7;
+      }
+
+      .card {
+        background: #1a1830;
+        border: 1px solid #2d2a4a;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1rem;
+      }
+
+      .card-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #a89fff;
+        margin-bottom: 0.75rem;
+      }
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+        margin-bottom: 1rem;
+      }
+
+      .kpi {
+        background: #1a1830;
+        border: 1px solid #2d2a4a;
+        border-radius: 12px;
+        padding: 0.875rem 1rem;
+      }
+
+      .kpi-val {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .kpi-lbl {
+        font-size: 11px;
+        color: #9896b8;
+      }
+
+      .verde {
+        color: #4ade80;
+      }
+      .amarelo {
+        color: #facc15;
+      }
+      .vermelho {
+        color: #f87171;
+      }
+      .roxo {
+        color: #a89fff;
+      }
+      .cinza {
+        color: #9896b8;
+      }
+
+      /* Tabela de extrato */
+      .extrato {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+
+      .extrato thead th {
+        text-align: left;
+        padding: 0.5rem 0.75rem;
+        font-size: 11px;
+        font-weight: 500;
+        color: #9896b8;
+        border-bottom: 1px solid #2d2a4a;
+      }
+
+      .extrato tbody tr {
+        border-bottom: 1px solid #1e1b3a;
+        transition: background 0.1s;
+      }
+
+      .extrato tbody tr:hover {
+        background: #1e1b3a;
+      }
+
+      .extrato td {
+        padding: 0.6rem 0.75rem;
+        vertical-align: middle;
+      }
+
+      .dia-header {
+        background: #12101e;
+        font-size: 11px;
+        font-weight: 600;
+        color: #534ab7;
+        padding: 0.4rem 0.75rem;
+      }
+
+      .badge {
+        display: inline-block;
+        font-size: 10px;
+        padding: 2px 8px;
+        border-radius: 6px;
+        background: #2d2a4a;
+        color: #9896b8;
+      }
+
+      .btn {
+        padding: 6px 14px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .btn-danger {
+        background: #7f1d1d;
+        color: #fca5a5;
+      }
+      .btn-sm {
+        padding: 3px 8px;
+        font-size: 11px;
+      }
+      .btn:hover {
+        opacity: 0.85;
+      }
+
+      .projecao-linha {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #2d2a4a;
+        font-size: 13px;
+      }
+
+      .projecao-linha:last-child {
+        border-bottom: none;
+      }
+      .proj-mes {
+        color: #c8c8d8;
+      }
+      .proj-saldo {
+        font-weight: 500;
+      }
+
+      .barra-wrap {
+        flex: 1;
+        margin: 0 1rem;
+        background: #2d2a4a;
+        border-radius: 4px;
+        height: 6px;
+        overflow: hidden;
+      }
+
+      .barra-fill {
+        height: 100%;
+        border-radius: 4px;
+        background: #534ab7;
+        transition: width 0.3s;
+      }
+
+      .empty {
+        color: #555;
+        font-size: 13px;
+        padding: 0.5rem 0;
+      }
+
+      @media (max-width: 480px) {
+        .extrato thead th:nth-child(3),
+        .extrato td:nth-child(3) {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="header">
+      <h1>Fiscal Analytics</h1>
+      <nav class="nav">
+        <a href="/">Dashboard</a>
+        <a href="/static/gastos.html" class="active">Gastos</a>
+        <a href="/static/dividas.html">Dívidas</a>
+        <a href="/static/config.html">Configurações</a>
+      </nav>
+    </div>
+
+    <!-- KPIs do mês -->
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-val verde" id="kpi-orcamento">R$ --</div>
+        <div class="kpi-lbl">Orçamento do mês</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val vermelho" id="kpi-gasto-mes">R$ --</div>
+        <div class="kpi-lbl">Gasto no mês</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val roxo" id="kpi-saldo-mes">R$ --</div>
+        <div class="kpi-lbl">Saldo restante</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val amarelo" id="kpi-diario">R$ --</div>
+        <div class="kpi-lbl">Orçamento diário</div>
+      </div>
+    </div>
+
+    <!-- Extrato dia a dia -->
+    <div class="card">
+      <div class="card-title">Extrato — mês atual</div>
+      <table class="extrato">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Descrição</th>
+            <th>Categoria</th>
+            <th style="text-align: right">Gasto</th>
+            <th style="text-align: right">Saldo dia</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="extrato-body">
+          <tr>
+            <td colspan="6" class="empty">Carregando...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Projeção de quitação das dívidas -->
+    <div class="card">
+      <div class="card-title">Projeção de quitação das dívidas</div>
+      <div style="font-size: 12px; color: #9896b8; margin-bottom: 0.75rem">
+        Com base no ritmo atual de pagamento de parcelas
+      </div>
+      <div id="projecao-lista"><div class="empty">Carregando...</div></div>
+    </div>
+
+    <script>
+      const API = "http://localhost:8000";
+      const fmt = (v) =>
+        "R$ " +
+        Number(v).toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      const fmtData = (d) =>
+        new Date(d + "T00:00:00").toLocaleDateString("pt-BR");
+
+      async function init() {
+        await carregarResumo();
+        await carregarExtrato();
+        await carregarProjecao();
+      }
+
+      // ── KPIs ────────────────────────────────────────────────────────
+      async function carregarResumo() {
+        const res = await fetch(`${API}/resumo`);
+        const d = await res.json();
+
+        document.getElementById("kpi-orcamento").textContent = fmt(
+          d.saldo_disponivel,
+        );
+        document.getElementById("kpi-gasto-mes").textContent = fmt(
+          d.total_gasto_mes,
+        );
+        document.getElementById("kpi-saldo-mes").textContent = fmt(
+          d.saldo_restante,
+        );
+        document.getElementById("kpi-diario").textContent = fmt(
+          d.orcamento_diario,
+        );
+      }
+
+      // ── Extrato dia a dia ───────────────────────────────────────────
+      async function carregarExtrato() {
+        const [calendario, gastos] = await Promise.all([
+          fetch(`${API}/calendario`).then((r) => r.json()),
+          fetch(`${API}/gastos`).then((r) => r.json()),
+        ]);
+
+        const tbody = document.getElementById("extrato-body");
+        let html = "";
+
+        // Agrupa gastos por data
+        const gastosPorData = {};
+        gastos.forEach((g) => {
+          if (!gastosPorData[g.data]) gastosPorData[g.data] = [];
+          gastosPorData[g.data].push(g);
+        });
+
+        calendario.forEach((dia) => {
+          const gastosNoDia = gastosPorData[dia.data] || [];
+          const corSaldo = dia.saldo_dia >= 0 ? "verde" : "vermelho";
+          const ehHoje = dia.eh_hoje;
+
+          // Cabeçalho do dia
+          html += `
+            <tr>
+            <td colspan="6" class="dia-header">
+                ${fmtData(dia.data)} ${ehHoje ? "← hoje" : ""}
+                &nbsp;·&nbsp; orçamento: ${fmt(dia.orcamento)}
+                &nbsp;·&nbsp; saldo do dia: <span class="${corSaldo}">${fmt(dia.saldo_dia)}</span>
+            </td>
+            </tr>
+        `;
+
+          if (gastosNoDia.length === 0) {
+            html += `
+            <tr>
+                <td colspan="6" style="padding:.4rem .75rem;font-size:12px;color:#555">
+                Nenhum gasto lançado
+                </td>
+            </tr>
+            `;
+          } else {
+            gastosNoDia.forEach((g) => {
+              html += `
+                <tr>
+                <td style="color:#555;font-size:12px">${fmtData(g.data)}</td>
+                <td>${g.descricao}</td>
+                <td><span class="badge">${g.categoria}</span></td>
+                <td style="text-align:right" class="vermelho">${fmt(g.valor)}</td>
+                <td style="text-align:right" class="${corSaldo}">${fmt(dia.saldo_dia)}</td>
+                <td style="text-align:right">
+                    <button class="btn btn-danger btn-sm" onclick="deletarGasto(${g.id})">×</button>
+                </td>
+                </tr>
+            `;
+            });
+          }
+        });
+
+        tbody.innerHTML =
+          html ||
+          '<tr><td colspan="6" class="empty">Nenhum dado disponível.</td></tr>';
+      }
+
+      // ── Projeção de quitação ────────────────────────────────────────
+      async function carregarProjecao() {
+        const dividas = await fetch(`${API}/dividas`).then((r) => r.json());
+        const lista = document.getElementById("projecao-lista");
+
+        if (dividas.length === 0) {
+          lista.innerHTML =
+            '<div class="empty">Nenhuma dívida cadastrada.</div>';
+          return;
+        }
+
+        const hoje = new Date();
+        let html = "";
+
+        dividas.forEach((d) => {
+          const parcelasRestantes = d.parcelas_total - d.parcelas_pagas;
+          const saldoDevedor = parcelasRestantes * d.valor_parcela;
+          const pct = Math.round((d.parcelas_pagas / d.parcelas_total) * 100);
+
+          // Calcula mês/ano de quitação
+          const dataQuitacao = new Date(hoje);
+          dataQuitacao.setMonth(dataQuitacao.getMonth() + parcelasRestantes);
+          const mesQuitacao = dataQuitacao.toLocaleDateString("pt-BR", {
+            month: "long",
+            year: "numeric",
+          });
+
+          const corSaldo =
+            saldoDevedor > 10000
+              ? "vermelho"
+              : saldoDevedor > 3000
+                ? "amarelo"
+                : "verde";
+
+          html += `
+            <div class="projecao-linha">
+            <div style="min-width:140px">
+                <div class="proj-mes">${d.nome}</div>
+                <div style="font-size:11px;color:#555">${parcelasRestantes} parcelas restantes</div>
+            </div>
+            <div class="barra-wrap">
+                <div class="barra-fill" style="width:${pct}%"></div>
+            </div>
+            <div style="text-align:right;min-width:130px">
+                <div class="proj-saldo ${corSaldo}">${fmt(saldoDevedor)}</div>
+                <div style="font-size:11px;color:#555">quita em ${mesQuitacao}</div>
+            </div>
+            </div>
+        `;
+        });
+
+        lista.innerHTML = html;
+      }
+
+      // ── Deletar gasto ───────────────────────────────────────────────
+      async function deletarGasto(id) {
+        await fetch(`${API}/gastos/${id}`, { method: "DELETE" });
+        await carregarExtrato();
+        await carregarResumo();
+      }
+
+      init();
+    </script>
+  </body>
+</html>

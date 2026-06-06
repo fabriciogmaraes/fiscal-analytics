@@ -1,361 +1,446 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fiscal Analytics</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #0F0E17;
-            color: #E8E8F0;
-            min-height: 100vh;
-            padding: 1rem;
-        }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #0f0e17;
+        color: #e8e8f0;
+        min-height: 100vh;
+        padding: 1rem;
+      }
 
-        .header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #2D2A4A;
-        }
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #2d2a4a;
+      }
 
-        .header h1 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #A89FFF;
-        }
+      .header h1 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #a89fff;
+      }
 
-        .nav{
-            display: flex;
-            gap: 8px;
-        }
+      .nav {
+        display: flex;
+        gap: 8px;
+      }
 
-        .nav a {
-            font-size: 12px;
-            padding: 6px 14px;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #9896B8;
-            border: 1px solid #2D2A4A;
-            transition: all .15s;
-        }
+      .nav a {
+        font-size: 12px;
+        padding: 6px 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #9896b8;
+        border: 1px solid #2d2a4a;
+        transition: all 0.15s;
+      }
 
-        .nav a:hover, .nav a.active {
-            background: #534AB7;
-            color: white;
-            border-color: #534AB7;
-        }
+      .nav a:hover,
+      .nav a.active {
+        background: #534ab7;
+        color: white;
+        border-color: #534ab7;
+      }
 
-        .semaforo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #1A1830;
-            border-radius: 12px;
-            padding: .75rem 1.25rem;
-            margin-bottom: 1rem;
-            border: 1px solid #2D2A4A;
-            }
+      .semaforo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #1a1830;
+        border-radius: 12px;
+        padding: 0.75rem 1.25rem;
+        margin-bottom: 1rem;
+        border: 1px solid #2d2a4a;
+      }
 
-        .semaforo-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-        }
+      .semaforo-dot {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+      }
 
-        .semaforo-texto {
-            font-size: 13px;
-            color: #9896B8;
-        }
+      .semaforo-texto {
+        font-size: 13px;
+        color: #9896b8;
+      }
 
-        .semaforo-texto strong {
-            color: #E8E8F0;
-        }
+      .semaforo-texto strong {
+        color: #e8e8f0;
+      }
 
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin-bottom: 1rem;
-        }
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        margin-bottom: 1rem;
+      }
 
-        .kpi {
-            background: #1A1830;
-            border: 1px solid #2D2A4A;
-            border-radius: 12px;
-            padding: .875rem 1rem;
-        }
+      .kpi {
+        background: #1a1830;
+        border: 1px solid #2d2a4a;
+        border-radius: 12px;
+        padding: 0.875rem 1rem;
+      }
 
-        .kpi-val {
-            font-size: 1.4rem;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
+      .kpi-val {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
 
-        .kpi-lbl {
-            font-size: 11px;
-            color: #9896B8;
-        }
+      .kpi-lbl {
+        font-size: 11px;
+        color: #9896b8;
+      }
 
-        .verde  { color: #4ADE80; }
-        .amarelo { color: #FACC15; }
-        .vermelho { color: #F87171; }
-        .roxo { color: #A89FFF; }
+      .verde {
+        color: #4ade80;
+      }
+      .amarelo {
+        color: #facc15;
+      }
+      .vermelho {
+        color: #f87171;
+      }
+      .roxo {
+        color: #a89fff;
+      }
 
-        .card {
-            background: #1A1830;
-            border: 1px solid #2D2A4A;
-            border-radius: 12px;
-            padding: 1rem 1.25rem;
-            margin-bottom: 1rem;
-        }
+      .card {
+        background: #1a1830;
+        border: 1px solid #2d2a4a;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1rem;
+      }
 
-        .card-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: #A89FFF;
-            margin-bottom: .75rem;
-        }
+      .card-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #a89fff;
+        margin-bottom: 0.75rem;
+      }
 
+      .form-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .form-row input,
+      .form-row select {
+        flex: 1;
+        min-width: 120px;
+        background: #0f0e17;
+        border: 1px solid #2d2a4a;
+        border-radius: 8px;
+        padding: 8px 12px;
+        color: #e8e8f0;
+        font-size: 13px;
+      }
+
+      .form-row input::placeholder {
+        color: #555;
+      }
+
+      .btn {
+        padding: 8px 18px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        transition: opacity 0.15s;
+      }
+
+      .btn:hover {
+        opacity: 0.85;
+      }
+      .btn-primary {
+        background: #534ab7;
+        color: white;
+      }
+      .btn-danger {
+        background: #7f1d1d;
+        color: #fca5a5;
+      }
+      .btn-sm {
+        padding: 4px 10px;
+        font-size: 11px;
+      }
+
+      .gasto-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #2d2a4a;
+        font-size: 13px;
+      }
+
+      .gasto-item:last-child {
+        border-bottom: none;
+      }
+      .gasto-desc {
+        color: #c8c8d8;
+      }
+      .gasto-val {
+        color: #f87171;
+        font-weight: 500;
+      }
+
+      .cal-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+      }
+
+      .cal-dia {
+        background: #0f0e17;
+        border: 1px solid #2d2a4a;
+        border-radius: 8px;
+        padding: 0.4rem 0.25rem;
+        text-align: center;
+      }
+
+      .cal-dia.hoje {
+        border-color: #534ab7;
+        background: #1e1b3a;
+      }
+
+      .cal-num {
+        font-size: 12px;
+        font-weight: 500;
+        color: #e8e8f0;
+      }
+
+      .cal-val {
+        font-size: 10px;
+        color: #9896b8;
+        margin-top: 2px;
+      }
+
+      .vencimento-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid #2d2a4a;
+        font-size: 13px;
+      }
+
+      .vencimento-item:last-child {
+        border-bottom: none;
+      }
+      .venc-nome {
+        color: #c8c8d8;
+      }
+      .venc-info {
+        text-align: right;
+      }
+      .venc-val {
+        color: #f87171;
+        font-weight: 500;
+        font-size: 12px;
+      }
+      .venc-dia {
+        color: #9896b8;
+        font-size: 11px;
+      }
+
+      .empty {
+        color: #555;
+        font-size: 13px;
+        padding: 0.5rem 0;
+      }
+
+      @media (max-width: 480px) {
         .form-row {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+          flex-direction: column;
         }
-
-        .form-row input, .form-row select {
-            flex: 1;
-            min-width: 120px;
-            background: #0F0E17;
-            border: 1px solid #2D2A4A;
-            border-radius: 8px;
-            padding: 8px 12px;
-            color: #E8E8F0;
-            font-size: 13px;
+        .kpi-val {
+          font-size: 1.2rem;
         }
-
-        .form-row input::placeholder { color: #555; }
-
-        .btn {
-            padding: 8px 18px;
-            border-radius: 8px;
-            border: none;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            transition: opacity .15s;
-        }
-
-        .btn:hover { opacity: .85; }
-        .btn-primary { background: #534AB7; color: white; }
-        .btn-danger  { background: #7F1D1D; color: #FCA5A5; }
-        .btn-sm { padding: 4px 10px; font-size: 11px; }
-
-        .gasto-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: .5rem 0;
-            border-bottom: 1px solid #2D2A4A;
-            font-size: 13px;
-        }
-
-        .gasto-item:last-child { border-bottom: none; }
-        .gasto-desc { color: #C8C8D8; }
-        .gasto-val  { color: #F87171; font-weight: 500; }
-
-        .cal-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-        }
-
-        .cal-dia {
-            background: #0F0E17;
-            border: 1px solid #2D2A4A;
-            border-radius: 8px;
-            padding: .4rem .25rem;
-            text-align: center;
-        }
-
-        .cal-dia.hoje {
-            border-color: #534AB7;
-            background: #1E1B3A;
-        }
-
-        .cal-num {
-            font-size: 12px;
-            font-weight: 500;
-            color: #E8E8F0;
-        }
-
-        .cal-val {
-            font-size: 10px;
-            color: #9896B8;
-            margin-top: 2px;
-        }
-
-        .vencimento-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: .5rem 0;
-            border-bottom: 1px solid #2D2A4A;
-            font-size: 13px;
-        }
-
-        .vencimento-item:last-child { border-bottom: none; }
-        .venc-nome { color: #C8C8D8; }
-        .venc-info { text-align: right; }
-        .venc-val  { color: #F87171; font-weight: 500; font-size: 12px; }
-        .venc-dia  { color: #9896B8; font-size: 11px; }
-
-        .empty { color: #555; font-size: 13px; padding: .5rem 0; }
-
-            @media (max-width: 480px) {
-            .form-row { flex-direction: column; }
-            .kpi-val  { font-size: 1.2rem; }
-        }
-
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Fiscal Analytics</h1>
+      <nav class="nav">
+        <a href="/" class="active">Dashboard</a>
+        <a href="/static/gastos.html">Gastos</a>
+        <a href="/static/dividas.html">Dívidas</a>
+        <a href="/static/config.html">Configurações</a>
+      </nav>
+    </div>
 
-        <div class="header">
-            <h1>Fiscal Analytics</h1>
-            <nav class="nav">
-            <a href="/" class="active">Dashboard</a>
-            <a href="/static/gastos.html">Gastos</a>
-            <a href="/static/dividas.html">Dívidas</a>
-            <a href="/static/config.html">Configurações</a>
-            </nav>
-        </div>
+    <!-- Semáforo -->
+    <div class="semaforo">
+      <div class="semaforo-dot" id="semaforo-dot"></div>
+      <div class="semaforo-texto" id="semaforo-texto">Carregando...</div>
+    </div>
 
-        <!-- Semáforo -->
-        <div class="semaforo">
-            <div class="semaforo-dot" id="semaforo-dot"></div>
-            <div class="semaforo-texto" id="semaforo-texto">Carregando...</div>
-        </div>
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-val verde" id="kpi-hoje">R$ --</div>
+        <div class="kpi-lbl">Posso gastar hoje</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val roxo" id="kpi-saldo">R$ --</div>
+        <div class="kpi-lbl">Saldo restante do mês</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val amarelo" id="kpi-dividas">R$ --</div>
+        <div class="kpi-lbl">Total de dívidas</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-val roxo" id="kpi-dias">-- dias</div>
+        <div class="kpi-lbl">Dias restantes no mês</div>
+      </div>
+    </div>
 
-        <!-- KPIs -->
-        <div class="kpi-grid">
-            <div class="kpi">
-            <div class="kpi-val verde" id="kpi-hoje">R$ --</div>
-            <div class="kpi-lbl">Posso gastar hoje</div>
-            </div>
-            <div class="kpi">
-            <div class="kpi-val roxo" id="kpi-saldo">R$ --</div>
-            <div class="kpi-lbl">Saldo restante do mês</div>
-            </div>
-            <div class="kpi">
-            <div class="kpi-val amarelo" id="kpi-dividas">R$ --</div>
-            <div class="kpi-lbl">Total de dívidas</div>
-            </div>
-            <div class="kpi">
-            <div class="kpi-val roxo" id="kpi-dias">-- dias</div>
-            <div class="kpi-lbl">Dias restantes no mês</div>
-            </div>
-        </div>
+    <!-- Lançar gasto rápido -->
+    <div class="card">
+      <div class="card-title">Lançar gasto</div>
+      <div class="form-row">
+        <input
+          type="text"
+          id="gasto-desc"
+          placeholder="Descrição (ex: almoço, uber)"
+        />
+        <input
+          type="number"
+          id="gasto-val"
+          placeholder="Valor (R$)"
+          step="0.01"
+        />
+        <select id="gasto-cat">
+          <option value="alimentação">Alimentação</option>
+          <option value="transporte">Transporte</option>
+          <option value="lazer">Lazer</option>
+          <option value="saúde">Saúde</option>
+          <option value="mercado">Mercado</option>
+          <option value="cartão">Cartão</option>
+          <option value="outro">Outro</option>
+        </select>
+        <button class="btn btn-primary" onclick="lancarGasto()">Lançar</button>
+      </div>
+    </div>
 
-        <!-- Lançar gasto rápido -->
-        <div class="card">
-            <div class="card-title">Lançar gasto</div>
-            <div class="form-row">
-            <input type="text" id="gasto-desc" placeholder="Descrição (ex: almoço, uber)">
-            <input type="number" id="gasto-val" placeholder="Valor (R$)" step="0.01">
-            <select id="gasto-cat">
-                <option value="alimentação">Alimentação</option>
-                <option value="transporte">Transporte</option>
-                <option value="lazer">Lazer</option>
-                <option value="saúde">Saúde</option>
-                <option value="mercado">Mercado</option>
-                <option value="cartão">Cartão</option>
-                <option value="outro">Outro</option>
-            </select>
-            <button class="btn btn-primary" onclick="lancarGasto()">Lançar</button>
-            </div>
-        </div>
+    <!-- Gastos de hoje -->
+    <div class="card">
+      <div class="card-title">Gastos de hoje</div>
+      <div id="gastos-hoje-lista">
+        <div class="empty">Nenhum gasto lançado hoje.</div>
+      </div>
+      <div style="margin-top: 0.75rem; font-size: 13px; color: #9896b8">
+        Total hoje:
+        <strong id="total-hoje" style="color: #f87171">R$ 0,00</strong>
+      </div>
+    </div>
 
-        <!-- Gastos de hoje -->
-        <div class="card">
-            <div class="card-title">Gastos de hoje</div>
-            <div id="gastos-hoje-lista"><div class="empty">Nenhum gasto lançado hoje.</div></div>
-            <div style="margin-top:.75rem;font-size:13px;color:#9896B8">
-            Total hoje: <strong id="total-hoje" style="color:#F87171">R$ 0,00</strong>
-            </div>
-        </div>
+    <!-- Calendário do mês -->
+    <div class="card">
+      <div class="card-title">Orçamento por dia</div>
+      <div class="cal-grid" id="calendario"></div>
+    </div>
 
-        <!-- Calendário do mês -->
-        <div class="card">
-            <div class="card-title">Orçamento por dia</div>
-            <div class="cal-grid" id="calendario"></div>
-        </div>
+    <!-- Próximos vencimentos -->
+    <div class="card">
+      <div class="card-title">Próximos vencimentos (15 dias)</div>
+      <div id="vencimentos-lista">
+        <div class="empty">Nenhum vencimento próximo.</div>
+      </div>
+    </div>
 
-        <!-- Próximos vencimentos -->
-        <div class="card">
-            <div class="card-title">Próximos vencimentos (15 dias)</div>
-            <div id="vencimentos-lista"><div class="empty">Nenhum vencimento próximo.</div></div>
-        </div>
+    <script>
+      const API = "http://localhost:8000";
+      const fmt = (v) =>
+        "R$ " +
+        Number(v).toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
 
-       <script>
-            const API = 'http://localhost:8000';
-            const fmt = v => 'R$ ' + Number(v).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      // ── Carrega tudo ao abrir a página ──────────────────────────────
+      async function init() {
+        await carregarResumo();
+        await carregarGastosHoje();
+        await carregarCalendario();
+        await carregarVencimentos();
+      }
 
-            // ── Carrega tudo ao abrir a página ──────────────────────────────
-            async function init() {
-                await carregarResumo();
-                await carregarGastosHoje();
-                await carregarCalendario();
-                await carregarVencimentos();
-            }
+      // ── Resumo financeiro + semáforo ────────────────────────────────
+      async function carregarResumo() {
+        const res = await fetch(`${API}/resumo`);
+        const d = await res.json();
 
-            // ── Resumo financeiro + semáforo ────────────────────────────────
-            async function carregarResumo() {
-                const res = await fetch(`${API}/resumo`);
-                const d   = await res.json();
+        document.getElementById("kpi-hoje").textContent = fmt(
+          d.pode_gastar_hoje,
+        );
+        document.getElementById("kpi-saldo").textContent = fmt(
+          d.saldo_restante,
+        );
+        document.getElementById("kpi-dividas").textContent = fmt(
+          d.total_dividas,
+        );
+        document.getElementById("kpi-dias").textContent =
+          d.dias_restantes_mes + " dias";
 
-                document.getElementById('kpi-hoje').textContent   = fmt(d.pode_gastar_hoje);
-                document.getElementById('kpi-saldo').textContent  = fmt(d.saldo_restante);
-                document.getElementById('kpi-dividas').textContent = fmt(d.total_dividas);
-                document.getElementById('kpi-dias').textContent   = d.dias_restantes_mes + ' dias';
+        // Semáforo
+        const dot = document.getElementById("semaforo-dot");
+        const texto = document.getElementById("semaforo-texto");
+        const pct = d.saldo_restante / (d.saldo_disponivel || 1);
 
-                // Semáforo
-                const dot   = document.getElementById('semaforo-dot');
-                const texto = document.getElementById('semaforo-texto');
-                const pct   = d.saldo_restante / (d.saldo_disponivel || 1);
+        if (d.pode_gastar_hoje <= 0) {
+          dot.style.background = "#F87171";
+          texto.innerHTML =
+            "<strong>🔴 Atenção:</strong> Orçamento de hoje esgotado.";
+        } else if (pct < 0.2) {
+          dot.style.background = "#FACC15";
+          texto.innerHTML =
+            "<strong>🟡 Cuidado:</strong> Saldo do mês abaixo de 20%.";
+        } else {
+          dot.style.background = "#4ADE80";
+          texto.innerHTML =
+            "<strong>🟢 Tudo certo:</strong> Orçamento no azul.";
+        }
+      }
 
-                if (d.pode_gastar_hoje <= 0) {
-                dot.style.background = '#F87171';
-                texto.innerHTML = '<strong>🔴 Atenção:</strong> Orçamento de hoje esgotado.';
-                } else if (pct < 0.2) {
-                dot.style.background = '#FACC15';
-                texto.innerHTML = '<strong>🟡 Cuidado:</strong> Saldo do mês abaixo de 20%.';
-                } else {
-                dot.style.background = '#4ADE80';
-                texto.innerHTML = '<strong>🟢 Tudo certo:</strong> Orçamento no azul.';
-                }
-            }
+      // ── Gastos de hoje ──────────────────────────────────────────────
+      async function carregarGastosHoje() {
+        const res = await fetch(`${API}/gastos/hoje`);
+        const gastos = await res.json();
+        const lista = document.getElementById("gastos-hoje-lista");
+        const total = gastos.reduce((a, g) => a + g.valor, 0);
 
-            // ── Gastos de hoje ──────────────────────────────────────────────
-            async function carregarGastosHoje() {
-                const res    = await fetch(`${API}/gastos/hoje`);
-                const gastos = await res.json();
-                const lista  = document.getElementById('gastos-hoje-lista');
-                const total  = gastos.reduce((a, g) => a + g.valor, 0);
+        document.getElementById("total-hoje").textContent = fmt(total);
 
-                document.getElementById('total-hoje').textContent = fmt(total);
+        if (gastos.length === 0) {
+          lista.innerHTML =
+            '<div class="empty">Nenhum gasto lançado hoje.</div>';
+          return;
+        }
 
-                if (gastos.length === 0) {
-                lista.innerHTML = '<div class="empty">Nenhum gasto lançado hoje.</div>';
-                return;
-                }
-
-                lista.innerHTML = gastos.map(g => `
+        lista.innerHTML = gastos
+          .map(
+            (g) => `
                 <div class="gasto-item">
                     <div>
                     <div class="gasto-desc">${g.descricao}</div>
@@ -366,48 +451,67 @@
                     <button class="btn btn-danger btn-sm" onclick="deletarGasto(${g.id})">×</button>
                     </div>
                 </div>
-                `).join('');
-            }
+                `,
+          )
+          .join("");
+      }
 
-            // ── Calendário do mês ───────────────────────────────────────────
-            async function carregarCalendario() {
-                const res  = await fetch(`${API}/calendario`);
-                const dias = await res.json();
-                const cal  = document.getElementById('calendario');
+      // ── Calendário do mês ───────────────────────────────────────────
+      async function carregarCalendario() {
+        const res = await fetch(`${API}/calendario`);
+        const dias = await res.json();
+        const cal = document.getElementById("calendario");
 
-                cal.innerHTML = dias.map(d => `
-                <div class="cal-dia ${d.eh_hoje ? 'hoje' : ''}">
+        cal.innerHTML = dias
+          .map(
+            (d) => `
+                <div class="cal-dia ${d.eh_hoje ? "hoje" : ""}">
                     <div class="cal-num">${d.dia}</div>
                     <div class="cal-val">${fmt(d.orcamento)}</div>
                 </div>
-                `).join('');
-            }
+                `,
+          )
+          .join("");
+      }
 
-            // ── Próximos vencimentos ────────────────────────────────────────
-            async function carregarVencimentos() {
-                const hoje = new Date().getDate();
-                const limite = hoje + 15;
+      // ── Próximos vencimentos ────────────────────────────────────────
+      async function carregarVencimentos() {
+        const hoje = new Date().getDate();
+        const limite = hoje + 15;
 
-                const [despesas, dividas] = await Promise.all([
-                fetch(`${API}/despesas`).then(r => r.json()),
-                fetch(`${API}/dividas`).then(r => r.json()),
-                ]);
+        const [despesas, dividas] = await Promise.all([
+          fetch(`${API}/despesas`).then((r) => r.json()),
+          fetch(`${API}/dividas`).then((r) => r.json()),
+        ]);
 
-                const itens = [
-                ...despesas.map(d => ({ nome: d.nome, valor: d.valor, dia: d.dia_vencimento, tipo: 'Despesa' })),
-                ...dividas.map(d => ({ nome: d.nome, valor: d.valor_parcela, dia: d.dia_vencimento, tipo: 'Dívida' })),
-                ]
-                .filter(i => i.dia >= hoje && i.dia <= limite)
-                .sort((a, b) => a.dia - b.dia);
+        const itens = [
+          ...despesas.map((d) => ({
+            nome: d.nome,
+            valor: d.valor,
+            dia: d.dia_vencimento,
+            tipo: "Despesa",
+          })),
+          ...dividas.map((d) => ({
+            nome: d.nome,
+            valor: d.valor_parcela,
+            dia: d.dia_vencimento,
+            tipo: "Dívida",
+          })),
+        ]
+          .filter((i) => i.dia >= hoje && i.dia <= limite)
+          .sort((a, b) => a.dia - b.dia);
 
-                const lista = document.getElementById('vencimentos-lista');
+        const lista = document.getElementById("vencimentos-lista");
 
-                if (itens.length === 0) {
-                lista.innerHTML = '<div class="empty">Nenhum vencimento nos próximos 15 dias.</div>';
-                return;
-                }
+        if (itens.length === 0) {
+          lista.innerHTML =
+            '<div class="empty">Nenhum vencimento nos próximos 15 dias.</div>';
+          return;
+        }
 
-                lista.innerHTML = itens.map(i => `
+        lista.innerHTML = itens
+          .map(
+            (i) => `
                 <div class="vencimento-item">
                     <div>
                     <div class="venc-nome">${i.nome}</div>
@@ -418,45 +522,53 @@
                     <div class="venc-dia">dia ${i.dia}</div>
                     </div>
                 </div>
-                `).join('');
-            }
+                `,
+          )
+          .join("");
+      }
 
-            // ── Lançar gasto ────────────────────────────────────────────────
-            async function lancarGasto() {
-                const desc = document.getElementById('gasto-desc').value.trim();
-                const val  = parseFloat(document.getElementById('gasto-val').value);
-                const cat  = document.getElementById('gasto-cat').value;
+      // ── Lançar gasto ────────────────────────────────────────────────
+      async function lancarGasto() {
+        const desc = document.getElementById("gasto-desc").value.trim();
+        const val = parseFloat(document.getElementById("gasto-val").value);
+        const cat = document.getElementById("gasto-cat").value;
 
-                if (!desc || isNaN(val) || val <= 0) {
-                alert('Preencha descrição e valor.');
-                return;
-                }
+        if (!desc || isNaN(val) || val <= 0) {
+          alert("Preencha descrição e valor.");
+          return;
+        }
 
-                const hoje = new Date().toISOString().slice(0, 10);
+        const hoje = new Date().toISOString().slice(0, 10);
 
-                await fetch(`${API}/gastos`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ descricao: desc, valor: val, data: hoje, categoria: cat, eh_cartao: cat === 'cartão' }),
-                });
+        await fetch(`${API}/gastos`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            descricao: desc,
+            valor: val,
+            data: hoje,
+            categoria: cat,
+            eh_cartao: cat === "cartão",
+          }),
+        });
 
-                document.getElementById('gasto-desc').value = '';
-                document.getElementById('gasto-val').value  = '';
+        document.getElementById("gasto-desc").value = "";
+        document.getElementById("gasto-val").value = "";
 
-                await carregarGastosHoje();
-                await carregarResumo();
-                await carregarCalendario();
-            }
+        await carregarGastosHoje();
+        await carregarResumo();
+        await carregarCalendario();
+      }
 
-            // ── Deletar gasto ───────────────────────────────────────────────
-            async function deletarGasto(id) {
-                await fetch(`${API}/gastos/${id}`, { method: 'DELETE' });
-                await carregarGastosHoje();
-                await carregarResumo();
-                await carregarCalendario();
-            }
+      // ── Deletar gasto ───────────────────────────────────────────────
+      async function deletarGasto(id) {
+        await fetch(`${API}/gastos/${id}`, { method: "DELETE" });
+        await carregarGastosHoje();
+        await carregarResumo();
+        await carregarCalendario();
+      }
 
-            init();
-    </script> 
-</body>
+      init();
+    </script>
+  </body>
 </html>
