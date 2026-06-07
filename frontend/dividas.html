@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fiscal Analytics — Dívidas</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #0f0e17;
+        color: #e8e8f0;
+        min-height: 100vh;
+        padding: 1rem;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #2d2a4a;
+      }
+
+      .header h1 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #a89fff;
+      }
+
+      .nav {
+        display: flex;
+        gap: 8px;
+      }
+      .nav a {
+        font-size: 12px;
+        padding: 6px 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #9896b8;
+        border: 1px solid #2d2a4a;
+        transition: all 0.15s;
+      }
+      .nav a:hover,
+      .nav a.active {
+        background: #534ab7;
+        color: white;
+        border-color: #534ab7;
+      }
+
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        margin-bottom: 1rem;
+      }
+
+      .kpi {
+        background: #1a1830;
+        border: 1px solid #2d2a4a;
+        border-radius: 12px;
+        padding: 0.875rem 1rem;
+      }
+
+      .kpi-val {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .kpi-lbl {
+        font-size: 11px;
+        color: #9896b8;
+      }
+
+      .card {
+        background: #1a1830;
+        border: 1px solid #2d2a4a;
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1rem;
+      }
+
+      .card-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #a89fff;
+        margin-bottom: 0.75rem;
+      }
+
+      .divida-card {
+        background: #0f0e17;
+        border: 1px solid #2d2a4a;
+        border-radius: 10px;
+        padding: 0.875rem 1rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .divida-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.6rem;
+      }
+
+      .divida-nome {
+        font-size: 14px;
+        font-weight: 600;
+        color: #e8e8f0;
+      }
+      .divida-status {
+        font-size: 10px;
+        padding: 2px 10px;
+        border-radius: 6px;
+        font-weight: 500;
+      }
+
+      .status-em-dia {
+        background: #14532d;
+        color: #86efac;
+      }
+      .status-atrasado {
+        background: #7f1d1d;
+        color: #fca5a5;
+      }
+
+      .divida-meta {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 8px;
+        margin-bottom: 0.75rem;
+      }
+
+      .meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .meta-lbl {
+        font-size: 10px;
+        color: #555;
+      }
+      .meta-val {
+        font-size: 13px;
+        font-weight: 500;
+        color: #e8e8f0;
+      }
+
+      .progress-wrap {
+        background: #2d2a4a;
+        border-radius: 4px;
+        height: 6px;
+        margin-bottom: 0.6rem;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        border-radius: 4px;
+        background: #534ab7;
+        transition: width 0.3s;
+      }
+
+      .divida-actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+
+      .btn {
+        padding: 6px 14px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+        transition: opacity 0.15s;
+      }
+
+      .btn:hover {
+        opacity: 0.85;
+      }
+      .btn-primary {
+        background: #534ab7;
+        color: white;
+      }
+      .btn-danger {
+        background: #7f1d1d;
+        color: #fca5a5;
+      }
+      .btn-success {
+        background: #14532d;
+        color: #86efac;
+      }
+      .btn-sm {
+        padding: 4px 10px;
+        font-size: 11px;
+      }
+
+      .form-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        flex: 1;
+        min-width: 120px;
+      }
+
+      .form-group label {
+        font-size: 11px;
+        color: #9896b8;
+      }
+
+      .form-group input,
+      .form-group select {
+        background: #0f0e17;
+        border: 1px solid #2d2a4a;
+        border-radius: 8px;
+        padding: 8px 12px;
+        color: #e8e8f0;
+        font-size: 13px;
+      }
+
+      .form-group input::placeholder {
+        color: #555;
+      }
+      .divider {
+        border: none;
+        border-top: 1px solid #2d2a4a;
+        margin: 0.75rem 0;
+      }
+
+      .verde {
+        color: #4ade80;
+      }
+      .amarelo {
+        color: #facc15;
+      }
+      .vermelho {
+        color: #f87171;
+      }
+      .roxo {
+        color: #a89fff;
+      }
+      .empty {
+        color: #555;
+        font-size: 13px;
+        padding: 0.5rem 0;
+      }
+
+      @media (max-width: 480px) {
+        .form-row {
+          flex-direction: column;
+        }
+      }
+    </style>
+
+    <body>
+      <div class="header">
+        <h1>Fiscal Analytics</h1>
+        <nav class="nav">
+          <a href="/">Dashboard</a>
+          <a href="/static/gastos.html">Gastos</a>
+          <a href="/static/dividas.html" class="active">Dívidas</a>
+          <a href="/static/config.html">Configurações</a>
+        </nav>
+      </div>
+
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi">
+          <div class="kpi-val vermelho" id="kpi-total-dividas">R$ --</div>
+          <div class="kpi-lbl">Total em dívidas</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-val amarelo" id="kpi-parcelas-mes">R$ --</div>
+          <div class="kpi-lbl">Parcelas este mês</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-val roxo" id="kpi-qtd-dividas">--</div>
+          <div class="kpi-lbl">Dívidas ativas</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-val verde" id="kpi-quitacao">--</div>
+          <div class="kpi-lbl">Quitação estimada</div>
+        </div>
+      </div>
+
+      <!-- Lista de dívidas -->
+      <div class="card">
+        <div class="card-title">Dívidas ativas</div>
+        <div id="dividas-lista">
+          <div class="empty">Nenhuma dívida cadastrada.</div>
+        </div>
+      </div>
+
+      <!-- Cadastrar nova dívida -->
+      <div class="card">
+        <div class="card-title">Cadastrar nova dívida</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nome</label>
+            <input
+              type="text"
+              id="div-nome"
+              placeholder="ex: Financiamento Apto, Empréstimo"
+            />
+          </div>
+          <div class="form-group">
+            <label>Valor total (R$)</label>
+            <input
+              type="number"
+              id="div-total"
+              placeholder="0,00"
+              step="0.01"
+            />
+          </div>
+          <div class="form-group">
+            <label>Valor da parcela (R$)</label>
+            <input
+              type="number"
+              id="div-parcela"
+              placeholder="0,00"
+              step="0.01"
+            />
+          </div>
+        </div>
+        <div class="form-row" style="margin-top: 8px">
+          <div class="form-group">
+            <label>Parcelas pagas</label>
+            <input type="number" id="div-pagas" placeholder="0" min="0" />
+          </div>
+          <div class="form-group">
+            <label>Total de parcelas</label>
+            <input type="number" id="div-total-parc" placeholder="0" min="1" />
+          </div>
+          <div class="form-group">
+            <label>Dia de vencimento</label>
+            <input
+              type="number"
+              id="div-dia"
+              placeholder="10"
+              min="1"
+              max="31"
+            />
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="div-status">
+              <option value="em_dia">Em dia</option>
+              <option value="atrasado">Atrasado</option>
+            </select>
+          </div>
+          <button
+            class="btn btn-primary"
+            style="align-self: flex-end"
+            onclick="adicionarDivida()"
+          >
+            Cadastrar
+          </button>
+        </div>
+      </div>
+
+      <script>
+        const API = "http://localhost:8000";
+        const fmt = (v) =>
+          "R$ " +
+          Number(v).toLocaleString("pt-BR", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          });
+
+        async function init() {
+          await carregarDividas();
+          await carregarKPIs();
+        }
+
+        // ── KPIs ────────────────────────────────────────────────────────
+        async function carregarKPIs() {
+          const [dividas, resumo] = await Promise.all([
+            fetch(`${API}/dividas`).then((r) => r.json()),
+            fetch(`${API}/resumo`).then((r) => r.json()),
+          ]);
+
+          const totalDividas = dividas.reduce(
+            (a, d) =>
+              a + d.valor_parcela * (d.parcelas_total - d.parcelas_pagas),
+            0,
+          );
+          const parcelasMes = dividas.reduce((a, d) => a + d.valor_parcela, 0);
+          const qtdAtivas = dividas.length;
+
+          // Quitação estimada — mês em que a última dívida termina
+          const hoje = new Date();
+          let maxMeses = 0;
+          dividas.forEach((d) => {
+            const restantes = d.parcelas_total - d.parcelas_pagas;
+            if (restantes > maxMeses) maxMeses = restantes;
+          });
+
+          const dataQuit = new Date(hoje);
+          dataQuit.setMonth(dataQuit.getMonth() + maxMeses);
+          const mesQuit =
+            maxMeses > 0
+              ? dataQuit.toLocaleDateString("pt-BR", {
+                  month: "long",
+                  year: "numeric",
+                })
+              : "—";
+
+          document.getElementById("kpi-total-dividas").textContent =
+            fmt(totalDividas);
+          document.getElementById("kpi-parcelas-mes").textContent =
+            fmt(parcelasMes);
+          document.getElementById("kpi-qtd-dividas").textContent =
+            qtdAtivas + " dívidas";
+          document.getElementById("kpi-quitacao").textContent = mesQuit;
+        }
+
+        // ── Lista de dívidas ────────────────────────────────────────────
+        async function carregarDividas() {
+          const dividas = await fetch(`${API}/dividas`).then((r) => r.json());
+          const lista = document.getElementById("dividas-lista");
+
+          if (dividas.length === 0) {
+            lista.innerHTML =
+              '<div class="empty">Nenhuma dívida cadastrada.</div>';
+            return;
+          }
+
+          const hoje = new Date();
+
+          lista.innerHTML = dividas
+            .map((d) => {
+              const restantes = d.parcelas_total - d.parcelas_pagas;
+              const saldoDevedor = restantes * d.valor_parcela;
+              const pct = Math.round(
+                (d.parcelas_pagas / d.parcelas_total) * 100,
+              );
+
+              const dataQuit = new Date(hoje);
+              dataQuit.setMonth(dataQuit.getMonth() + restantes);
+              const mesQuit = dataQuit.toLocaleDateString("pt-BR", {
+                month: "long",
+                year: "numeric",
+              });
+
+              const corSaldo =
+                saldoDevedor > 10000
+                  ? "vermelho"
+                  : saldoDevedor > 3000
+                    ? "amarelo"
+                    : "verde";
+              const statusClass =
+                d.status === "atrasado" ? "status-atrasado" : "status-em-dia";
+              const statusLabel =
+                d.status === "atrasado" ? "Atrasado" : "Em dia";
+
+              return `
+        <div class="divida-card">
+          <div class="divida-header">
+            <div class="divida-nome">${d.nome}</div>
+            <span class="divida-status ${statusClass}">${statusLabel}</span>
+          </div>
+          <div class="divida-meta">
+            <div class="meta-item">
+              <span class="meta-lbl">Saldo devedor</span>
+              <span class="meta-val ${corSaldo}">${fmt(saldoDevedor)}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-lbl">Parcela mensal</span>
+              <span class="meta-val">${fmt(d.valor_parcela)}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-lbl">Parcelas</span>
+              <span class="meta-val">${d.parcelas_pagas} / ${d.parcelas_total}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-lbl">Vencimento</span>
+              <span class="meta-val">dia ${d.dia_vencimento}</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-lbl">Quitação estimada</span>
+              <span class="meta-val">${mesQuit}</span>
+            </div>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-fill" style="width:${pct}%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+            <span style="font-size:11px;color:#555">${pct}% pago</span>
+            <span style="font-size:11px;color:#555">${restantes} parcelas restantes</span>
+          </div>
+          <div class="divida-actions">
+            <button class="btn btn-success btn-sm" onclick="registrarParcela(${d.id})">
+              ✓ Registrar parcela paga
+            </button>
+            <button class="btn btn-danger btn-sm" onclick="deletarDivida(${d.id})">
+              Remover
+            </button>
+          </div>
+        </div>
+      `;
+            })
+            .join("");
+        }
+
+        // ── Adicionar dívida ────────────────────────────────────────────
+        async function adicionarDivida() {
+          const nome = document.getElementById("div-nome").value.trim();
+          const total = parseFloat(document.getElementById("div-total").value);
+          const parcela = parseFloat(
+            document.getElementById("div-parcela").value,
+          );
+          const pagas =
+            parseInt(document.getElementById("div-pagas").value) || 0;
+          const totalParc = parseInt(
+            document.getElementById("div-total-parc").value,
+          );
+          const dia = parseInt(document.getElementById("div-dia").value);
+          const status = document.getElementById("div-status").value;
+
+          if (
+            !nome ||
+            isNaN(total) ||
+            isNaN(parcela) ||
+            isNaN(totalParc) ||
+            isNaN(dia)
+          ) {
+            alert("Preencha todos os campos obrigatórios.");
+            return;
+          }
+
+          await fetch(`${API}/dividas`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              nome,
+              valor_total: total,
+              valor_parcela: parcela,
+              parcelas_pagas: pagas,
+              parcelas_total: totalParc,
+              dia_vencimento: dia,
+              status,
+            }),
+          });
+
+          document.getElementById("div-nome").value = "";
+          document.getElementById("div-total").value = "";
+          document.getElementById("div-parcela").value = "";
+          document.getElementById("div-pagas").value = "";
+          document.getElementById("div-total-parc").value = "";
+          document.getElementById("div-dia").value = "";
+
+          await carregarDividas();
+          await carregarKPIs();
+        }
+
+        // ── Registrar parcela paga ──────────────────────────────────────
+        async function registrarParcela(id) {
+          await fetch(`${API}/dividas/${id}/parcela`, { method: "PUT" });
+          await carregarDividas();
+          await carregarKPIs();
+        }
+
+        // ── Deletar dívida ──────────────────────────────────────────────
+        async function deletarDivida(id) {
+          if (!confirm("Remover esta dívida?")) return;
+          await fetch(`${API}/dividas/${id}`, { method: "DELETE" });
+          await carregarDividas();
+          await carregarKPIs();
+        }
+
+        init();
+      </script>
+    </body>
+  </head>
+</html>
