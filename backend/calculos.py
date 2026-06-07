@@ -1,5 +1,4 @@
-from dataclasses import replace
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from sqlalchemy.orm import Session
 from database import Receita, DespesaFixa, Divida, Gasto, Configuracao
 
@@ -7,10 +6,9 @@ from database import Receita, DespesaFixa, Divida, Gasto, Configuracao
 def dias_restantes_mes(hoje: date = None) -> int:
     if hoje is None:
         hoje = date.today()
-    ultimo_dia = date(hoje.year, hoje.month + 1, 1) - replace(days=1)
-    from datetime import timedelta
-    ultimo_dia = ultimo_dia - timedelta(days=1)
-    return (ultimo_dia.day - hoje.day + 1)
+    proximo_mes = date(hoje.year, hoje.month + 1, 1) if hoje.month < 12 else date(hoje.year + 1, 1, 1)
+    ultimo_dia = proximo_mes - timedelta(days=1)
+    return ultimo_dia.day - hoje.day + 1
 
 def ultimo_dia_mes(hoje: date = None) -> int:
     if hoje is None:
@@ -35,7 +33,13 @@ def calcular_resumo(db: Session) -> dict:
 
     # Receitas ativas
     receitas = db.query(Receita).filter(Receita.ativo == True).all()
-    total_receitas = sum(r.valor for r in receitas)
+    total_receitas = sum(
+        r.valor for r in receitas
+        if r.recorrente or (
+            r.mes_referencia == hoje.month and
+            r.ano_referencia == hoje.year
+        )
+    )
 
     # receitas fixas ativas
     despesas = db.query(DespesaFixa).filter(DespesaFixa.ativo == True).all()

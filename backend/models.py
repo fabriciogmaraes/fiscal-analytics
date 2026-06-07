@@ -8,12 +8,18 @@ class ReceitaCreate(BaseModel):
     nome: str
     valor: float
     dia_recebimento: int
+    recorrente: Optional[bool] = True
+    mes_referencia: Optional[int] = None
+    ano_referencia: Optional[int] = None
 
 class ReceitaResponse(BaseModel):
     id: int
     nome: str
     valor: float
     dia_recebimento: int
+    recorrente: bool
+    mes_referencia: Optional[int] = None
+    ano_referencia: Optional[int] = None
     ativo: bool
 
     model_config = {"from_attributes": True}
@@ -101,4 +107,3 @@ class ResumoFinanceiro(BaseModel):
     pode_gastar_hoje: float
     total_dividas: float
     dia_restantes_mes: int
-

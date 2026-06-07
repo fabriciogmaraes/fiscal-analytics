@@ -5,3 +5,4 @@ fiscal.db
 .env
 *.db
 .idea/
+data/

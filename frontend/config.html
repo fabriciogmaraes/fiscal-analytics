@@ -296,7 +296,7 @@
           <input
             type="text"
             id="rec-nome"
-            placeholder="ex: Salário, Aluguel recebido"
+            placeholder="ex: Salário, Receita Federal"
           />
         </div>
         <div class="form-group">
@@ -307,9 +307,41 @@
           <label>Dia de recebimento</label>
           <input type="number" id="rec-dia" placeholder="1" min="1" max="31" />
         </div>
+        <div class="form-group">
+          <label>Tipo</label>
+          <select id="rec-recorrente" onchange="toggleMesReferencia()">
+            <option value="true">Recorrente (todo mês)</option>
+            <option value="false">Pontual (só este mês)</option>
+          </select>
+        </div>
         <button class="btn btn-primary" onclick="adicionarReceita()">
           Adicionar
         </button>
+      </div>
+      <div id="mes-referencia-wrap" style="display: none; margin-top: 8px">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Mês de referência</label>
+            <select id="rec-mes">
+              <option value="1">Janeiro</option>
+              <option value="2">Fevereiro</option>
+              <option value="3">Março</option>
+              <option value="4">Abril</option>
+              <option value="5">Maio</option>
+              <option value="6">Junho</option>
+              <option value="7">Julho</option>
+              <option value="8">Agosto</option>
+              <option value="9">Setembro</option>
+              <option value="10">Outubro</option>
+              <option value="11">Novembro</option>
+              <option value="12">Dezembro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Ano</label>
+            <input type="number" id="rec-ano" placeholder="2026" value="2026" />
+          </div>
+        </div>
       </div>
     </div>
 
@@ -452,25 +484,39 @@
         lista.innerHTML = receitas
           .map(
             (r) => `
-      <div class="item">
-        <div class="item-left">
-          <span class="item-nome">${r.nome}</span>
-          <span class="item-meta">Recebe todo dia ${r.dia_recebimento}</span>
-        </div>
-        <div style="display:flex;align-items:center">
-          <span class="item-val">${fmt(r.valor)}</span>
-          <button class="btn btn-danger btn-sm" onclick="deletarReceita(${r.id})">Remover</button>
-        </div>
-      </div>
-    `,
+                  <div class="item">
+                    <div class="item-left">
+                      <span class="item-nome">${r.nome}</span>
+                      <span class="item-meta">Recebe todo dia ${r.dia_recebimento}</span>
+                    </div>
+                    <div style="display:flex;align-items:center">
+                      <span class="item-val">${fmt(r.valor)}</span>
+                      <button class="btn btn-danger btn-sm" onclick="deletarReceita(${r.id})">Remover</button>
+                    </div>
+                  </div>
+                `,
           )
           .join("");
+      }
+
+      function toggleMesReferencia() {
+        const recorrente = document.getElementById("rec-recorrente").value;
+        document.getElementById("mes-referencia-wrap").style.display =
+          recorrente === "false" ? "block" : "none";
       }
 
       async function adicionarReceita() {
         const nome = document.getElementById("rec-nome").value.trim();
         const valor = parseFloat(document.getElementById("rec-valor").value);
         const dia = parseInt(document.getElementById("rec-dia").value);
+        const recorrente =
+          document.getElementById("rec-recorrente").value === "true";
+        const mes = recorrente
+          ? null
+          : parseInt(document.getElementById("rec-mes").value);
+        const ano = recorrente
+          ? null
+          : parseInt(document.getElementById("rec-ano").value);
 
         if (!nome || isNaN(valor) || valor <= 0 || isNaN(dia)) {
           alert("Preencha todos os campos.");
@@ -480,12 +526,21 @@
         await fetch(`${API}/receitas`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nome, valor, dia_recebimento: dia }),
+          body: JSON.stringify({
+            nome,
+            valor,
+            dia_recebimento: dia,
+            recorrente,
+            mes_referencia: mes,
+            ano_referencia: ano,
+          }),
         });
 
         document.getElementById("rec-nome").value = "";
         document.getElementById("rec-valor").value = "";
         document.getElementById("rec-dia").value = "";
+        document.getElementById("rec-recorrente").value = "true";
+        document.getElementById("mes-referencia-wrap").style.display = "none";
 
         await carregarReceitas();
         await carregarResumo();
@@ -512,17 +567,17 @@
         lista.innerHTML = despesas
           .map(
             (d) => `
-      <div class="item">
-        <div class="item-left">
-          <span class="item-nome">${d.nome}</span>
-          <span class="item-meta">${d.categoria} · vence todo dia ${d.dia_vencimento}</span>
-        </div>
-        <div style="display:flex;align-items:center">
-          <span class="item-val-neg">${fmt(d.valor)}</span>
-          <button class="btn btn-danger btn-sm" onclick="deletarDespesa(${d.id})">Remover</button>
-        </div>
-      </div>
-    `,
+                  <div class="item">
+                    <div class="item-left">
+                      <span class="item-nome">${d.nome}</span>
+                      <span class="item-meta">${d.categoria} · vence todo dia ${d.dia_vencimento}</span>
+                    </div>
+                    <div style="display:flex;align-items:center">
+                      <span class="item-val-neg">${fmt(d.valor)}</span>
+                      <button class="btn btn-danger btn-sm" onclick="deletarDespesa(${d.id})">Remover</button>
+                    </div>
+                  </div>
+                `,
           )
           .join("");
       }
@@ -541,17 +596,18 @@
         await fetch(`${API}/despesas`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            nome,
-            valor,
-            dia_vencimento: dia,
-            categoria: cat,
+          body: JSON.stringify({ 
+            nome, 
+            valor, 
+            dia_vencimento: dia, // Chave correta para despesa
+            categoria: cat       // Enviando a categoria selecionada
           }),
         });
 
         document.getElementById("desp-nome").value = "";
         document.getElementById("desp-valor").value = "";
         document.getElementById("desp-dia").value = "";
+        document.getElementById("desp-cat").value = "";
 
         await carregarDespesas();
         await carregarResumo();

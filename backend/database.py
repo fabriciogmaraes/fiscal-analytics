@@ -17,12 +17,15 @@ Base = declarative_base()
 class Receita(Base):
     __tablename__ = "receitas"
 
-    id               = Column(Integer, primary_key=True, index=True)
-    nome             = Column(String, nullable=False) #ex: "Salário", "Alguel Recebido"
-    valor            = Column(Float, nullable=False)
-    dia_recebimento  = Column(Integer, nullable=False) #dia do mês que a receita é recebida
-    ativo            = Column(Boolean, default=True)
-    criado_em        = Column(DateTime, default=datetime.utcnow)
+    id              = Column(Integer, primary_key=True, index=True)
+    nome            = Column(String, nullable=False)
+    valor           = Column(Float, nullable=False)
+    dia_recebimento = Column(Integer, nullable=False)
+    recorrente      = Column(Boolean, default=True)   # False = pontual
+    mes_referencia  = Column(Integer, nullable=True)  # 1-12, só pra receitas pontuais
+    ano_referencia  = Column(Integer, nullable=True)  # ano da receita pontual
+    ativo           = Column(Boolean, default=True)
+    criado_em       = Column(DateTime, default=datetime.utcnow)
 
 class DespesaFixa(Base):
     __tablename__ = "despesas_fixas"
